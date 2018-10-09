@@ -33,7 +33,8 @@ class Income(models.Model):
     time = models.DateTimeField()
     comment = models.CharField(max_length=255, blank=True, null=True)
     Wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, on_delete=models.SET_NULL)
+    group = models.ForeignKey(
+        Group, on_delete=models.SET_NULL, blank=True, null=True)
 
 
 class Expense(models.Model):
@@ -43,7 +44,8 @@ class Expense(models.Model):
     time = models.DateTimeField()
     comment = models.CharField(max_length=255, blank=True, null=True)
     Wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, on_delete=models.SET_NULL)
+    group = models.ForeignKey(
+        Group, on_delete=models.SET_NULL, blank=True, null=True)
 
 
 class Transfer(models.Model):
@@ -52,5 +54,7 @@ class Transfer(models.Model):
     amount = models.BigIntegerField()
     time = models.DateTimeField()
     comment = models.CharField(max_length=255, blank=True, null=True)
-    source_Wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
-    target_wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    source_Wallet = models.ForeignKey(
+        Wallet, on_delete=models.CASCADE, related_name='source_wallet')
+    target_wallet = models.ForeignKey(
+        Wallet, on_delete=models.CASCADE, related_name='target_wallet')
