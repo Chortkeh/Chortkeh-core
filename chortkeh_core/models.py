@@ -44,3 +44,13 @@ class Expense(models.Model):
     comment = models.CharField(max_length=255, blank=True, null=True)
     Wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.SET_NULL)
+
+
+class Transfer(models.Model):
+    """ This model for transfer transactions. """
+
+    amount = models.BigIntegerField()
+    time = models.DateTimeField()
+    comment = models.CharField(max_length=255, blank=True, null=True)
+    source_Wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    target_wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
