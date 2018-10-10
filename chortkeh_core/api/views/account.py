@@ -99,3 +99,9 @@ class Account(views.APIView):
                 data={'errors': serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+    def delete(self, request, *arg, **kwargs):
+
+        user_object = User.objects.get(id=request.user.id)
+        user_object.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
