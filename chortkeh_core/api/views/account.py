@@ -5,6 +5,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from django.contrib.auth import get_user_model
 from ..permissions import AllowOnlyPost
+from ..serializers import CreateAccountSerializer, UpdateAccountSerializer
 
 User = get_user_model()
 
@@ -55,15 +56,14 @@ class Account(views.APIView):
     def post(self, request, *arg, **kwargs):
         """ POST method use for registeration. """
 
-        username = request.data.get('username')
-        password = request.data.get('password')
-        email = request.data.get('email')
-        first_name = request.data.get('first_name')
-        last_name = request.data.get('last_name')
-
-        if username and password and email and first_name:
-            user_object = User(username=username, email=email,
-                               first_name=first_name, last_name=last_name)
+        serializer = CreateAccountSerializer(request.data)
+        if serializer.is_valid():
+            user_object = User(
+                username=serializer.validated_data.get('username'),
+                email=serializer.validated_data.get('email'),
+                first_name=serializer.validated_data.get('first_name'),
+                last_name=serializer.validated_data.get('last_name')
+            )
             user_object.set_password(password)
             user_object.save()
             token, _ = Token.objects.get_or_create(user=user_object)
@@ -74,6 +74,28 @@ class Account(views.APIView):
                 'token': token.key
             }, status=status.HTTP_201_CREATED)
         else:
-            return Response(data={
-                'message': '(username, password, email, first_name) is required.'
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data={'errors': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def put(self, request, *arg, **kwargs):
+
+        serializer = UpdateAccountSerializer(request.data)
+        if serializer.is_valid():
+            user_object = User.objects.get(id=request.user.id)
+            user_object.email = serializer.validated_data.get('email')
+            user_object.first_name = serializer.validated_data.get(
+                'first_name')
+            user_object.last_name = serializer.validated_data.get('last_name')
+            user_object.save()
+            return Response(
+                data={
+                    'message': 'Your account has been updated successfully.'
+                }, status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                data={'errors': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
