@@ -64,7 +64,7 @@ class Account(views.APIView):
                 first_name=serializer.validated_data.get('first_name'),
                 last_name=serializer.validated_data.get('last_name')
             )
-            user_object.set_password(password)
+            user_object.set_password(request.data.get('password'))
             user_object.save()
             token, _ = Token.objects.get_or_create(user=user_object)
             return Response(data={
