@@ -9,7 +9,6 @@ class Wallet(models.Model):
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    balance = models.BigIntegerField()
 
 
 class Group(models.Model):
