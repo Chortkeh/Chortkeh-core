@@ -16,3 +16,8 @@ class UpdateAccountSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=30)
     last_name = serializers.CharField(
         max_length=150, allow_blank=True, allow_null=True)
+
+
+class WalletSerializer(serializers.Serializer):
+
+    name = serializers.CharField(max_length=255)
