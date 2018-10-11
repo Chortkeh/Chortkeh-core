@@ -13,6 +13,37 @@ class WalletApiView(views.APIView):
 
     permission_classes = (permissions.IsAuthenticated,)
 
+    def get(self, request, *args, **kwargs):
+        """ GET method use for get wallets list and details. """
+
+        if kwargs.get('pk'):
+            try:
+                wallet_query = Wallet.objects.get(
+                    id=kwargs.get('pk'), owner=request.user)
+            except ObjectDoesNotExist:
+                return Response(
+                    data={'errors': 'Wallet not found.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            response_data = {
+                'id': wallet_query.id,
+                'name': wallet_query.name
+            }
+            response_status_code = status.HTTP_200_OK
+        else:
+            wallet_query_set = Wallet.objects.filter(owner=request.user)
+            if wallet_query_set.count() > 0:
+                wallet_list = [
+                    {'id': q.id, 'name': q.name} for q in wallet_query_set]
+                response_data = {
+                    'count': wallet_query_set.count(), 'items': wallet_list}
+                response_status_code = status.HTTP_200_OK
+            else:
+                response_data = {'errors': 'You don\'t have a wallet.'}
+                response_status_code = status.HTTP_404_NOT_FOUND
+
+        return Response(data=response_data, status=response_status_code)
+
     def post(self, request, *args, **kwargs):
         """ POST method use for create new wallet. """
 
@@ -37,8 +68,7 @@ class WalletApiView(views.APIView):
         if kwargs.get('pk'):
             try:
                 wallet_object = Wallet.objects.get(
-                    id=kwargs.get('pk'), owner=request.user
-                )
+                    id=kwargs.get('pk'), owner=request.user)
             except ObjectDoesNotExist:
                 return Response(
                     data={'errors': 'Wallet not found.'},
@@ -55,6 +85,27 @@ class WalletApiView(views.APIView):
             else:
                 response_data = {'errors': serializer.errors}
                 response_status_code = status.HTTP_400_BAD_REQUEST
+        else:
+            response_data = {'errors': 'PK is requirede.'}
+            response_status_code = status.HTTP_400_BAD_REQUEST
+
+        return Response(data=response_data, status=response_status_code)
+
+    def delete(self, request, *args, **kwargs):
+        """ DELETE method use for delete a wallet. """
+
+        if kwargs.get('pk'):
+            try:
+                wallet_query = Wallet.objects.get(
+                    id=kwargs.get('pk'), owner=request.user)
+            except ObjectDoesNotExist:
+                return Response(
+                    data={'errors': 'Wallet not found.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            wallet_query.delete()
+            response_data = None
+            response_status_code = status.HTTP_204_NO_CONTENT
         else:
             response_data = {'errors': 'PK is requirede.'}
             response_status_code = status.HTTP_400_BAD_REQUEST
