@@ -47,7 +47,7 @@ class WalletApiView(views.APIView):
     def post(self, request, *args, **kwargs):
         """ POST method use for create new wallet. """
 
-        serializer = WalletSerializer(request.data)
+        serializer = WalletSerializer(data=request.data)
         if serializer.is_valid():
             user_object = User.objects.get(id=request.user.id)
             wallet_object = Wallet.objects.create(
@@ -74,7 +74,7 @@ class WalletApiView(views.APIView):
                     data={'errors': 'Wallet not found.'},
                     status=status.HTTP_404_NOT_FOUND
                 )
-            serializer = WalletSerializer(request.data)
+            serializer = WalletSerializer(data=request.data)
             if serializer.is_valid():
                 wallet_object.name = serializer.validated_data.get('name')
                 wallet_object.save()

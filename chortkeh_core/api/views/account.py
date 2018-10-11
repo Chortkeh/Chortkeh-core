@@ -56,7 +56,7 @@ class Account(views.APIView):
     def post(self, request, *arg, **kwargs):
         """ POST method use for registeration. """
 
-        serializer = CreateAccountSerializer(request.data)
+        serializer = CreateAccountSerializer(data=request.data)
         if serializer.is_valid():
             user_object = User(
                 username=serializer.validated_data.get('username'),
@@ -81,7 +81,7 @@ class Account(views.APIView):
 
     def put(self, request, *arg, **kwargs):
 
-        serializer = UpdateAccountSerializer(request.data)
+        serializer = UpdateAccountSerializer(data=request.data)
         if serializer.is_valid():
             user_object = User.objects.get(id=request.user.id)
             user_object.email = serializer.validated_data.get('email')
