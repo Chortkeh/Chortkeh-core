@@ -47,18 +47,13 @@ class WalletApiView(views.APIView):
         """ POST method use for create new wallet. """
 
         serializer = WalletSerializer(data=request.data)
-        if serializer.is_valid():
-            wallet_object = Wallet.objects.create(
-                owner=request.user,
-                name=serializer.validated_data.get('name'),
-            )
-            response_data = {'id': wallet_object.id}
-            response_status_code = status.HTTP_201_CREATED
-        else:
-            response_data = {'errors': serializer.errors}
-            response_status_code = status.HTTP_400_BAD_REQUEST
-
-        return Response(data=response_data, status=response_status_code)
+        serializer.is_valid(raise_exception=True)
+        wallet_object = Wallet.objects.create(
+            owner=request.user,
+            name=serializer.validated_data.get('name'),
+        )
+        return Response(
+            data={'id': wallet_object.id}, status=status.HTTP_201_CREATED)
 
     def put(self, request, *args, **kwargs):
         """ PUT method use for update a wallet. """
@@ -72,16 +67,13 @@ class WalletApiView(views.APIView):
                 response_status_code = status.HTTP_404_NOT_FOUND
             else:
                 serializer = WalletSerializer(data=request.data)
-                if serializer.is_valid():
-                    wallet_object.name = serializer.validated_data.get('name')
-                    wallet_object.save()
-                    response_data = {
-                        'message': 'Wallet has been updated successfully.'
-                    }
-                    response_status_code = status.HTTP_200_OK
-                else:
-                    response_data = {'errors': serializer.errors}
-                    response_status_code = status.HTTP_400_BAD_REQUEST
+                serializer.is_valid(raise_exception=True)
+                wallet_object.name = serializer.validated_data.get('name')
+                wallet_object.save()
+                response_data = {
+                    'message': 'Wallet has been updated successfully.'
+                }
+                response_status_code = status.HTTP_200_OK
         else:
             response_data = {'errors': 'PK is requirede.'}
             response_status_code = status.HTTP_400_BAD_REQUEST
