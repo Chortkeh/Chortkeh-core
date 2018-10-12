@@ -21,15 +21,14 @@ class WalletApiView(views.APIView):
                 wallet_query = Wallet.objects.get(
                     id=kwargs.get('pk'), owner=request.user)
             except ObjectDoesNotExist:
-                return Response(
-                    data={'errors': 'Wallet not found.'},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            response_data = {
-                'id': wallet_query.id,
-                'name': wallet_query.name
-            }
-            response_status_code = status.HTTP_200_OK
+                response_data = {'errors': 'Wallet not found.'}
+                response_status_code = status.HTTP_404_NOT_FOUND
+            else:
+                response_data = {
+                    'id': wallet_query.id,
+                    'name': wallet_query.name
+                }
+                response_status_code = status.HTTP_200_OK
         else:
             wallet_query_set = Wallet.objects.filter(owner=request.user)
             if wallet_query_set.count() > 0:
@@ -49,9 +48,8 @@ class WalletApiView(views.APIView):
 
         serializer = WalletSerializer(data=request.data)
         if serializer.is_valid():
-            user_object = User.objects.get(id=request.user.id)
             wallet_object = Wallet.objects.create(
-                owner=user_object,
+                owner=request.user,
                 name=serializer.validated_data.get('name'),
             )
             response_data = {'id': wallet_object.id}
@@ -70,21 +68,20 @@ class WalletApiView(views.APIView):
                 wallet_object = Wallet.objects.get(
                     id=kwargs.get('pk'), owner=request.user)
             except ObjectDoesNotExist:
-                return Response(
-                    data={'errors': 'Wallet not found.'},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            serializer = WalletSerializer(data=request.data)
-            if serializer.is_valid():
-                wallet_object.name = serializer.validated_data.get('name')
-                wallet_object.save()
-                response_data = {
-                    'message': 'Wallet has been updated successfully.'
-                }
-                response_status_code = status.HTTP_200_OK
+                response_data = {'errors': 'Wallet not found.'}
+                response_status_code = status.HTTP_404_NOT_FOUND
             else:
-                response_data = {'errors': serializer.errors}
-                response_status_code = status.HTTP_400_BAD_REQUEST
+                serializer = WalletSerializer(data=request.data)
+                if serializer.is_valid():
+                    wallet_object.name = serializer.validated_data.get('name')
+                    wallet_object.save()
+                    response_data = {
+                        'message': 'Wallet has been updated successfully.'
+                    }
+                    response_status_code = status.HTTP_200_OK
+                else:
+                    response_data = {'errors': serializer.errors}
+                    response_status_code = status.HTTP_400_BAD_REQUEST
         else:
             response_data = {'errors': 'PK is requirede.'}
             response_status_code = status.HTTP_400_BAD_REQUEST
@@ -99,13 +96,12 @@ class WalletApiView(views.APIView):
                 wallet_query = Wallet.objects.get(
                     id=kwargs.get('pk'), owner=request.user)
             except ObjectDoesNotExist:
-                return Response(
-                    data={'errors': 'Wallet not found.'},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            wallet_query.delete()
-            response_data = None
-            response_status_code = status.HTTP_204_NO_CONTENT
+                response_data = {'errors': 'Group not found.'}
+                response_status_code = status.HTTP_404_NOT_FOUND
+            else:
+                wallet_query.delete()
+                response_data = None
+                response_status_code = status.HTTP_204_NO_CONTENT
         else:
             response_data = {'errors': 'PK is requirede.'}
             response_status_code = status.HTTP_400_BAD_REQUEST
