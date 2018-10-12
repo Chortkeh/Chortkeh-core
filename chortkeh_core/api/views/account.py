@@ -57,50 +57,42 @@ class Account(views.APIView):
         """ POST method use for registeration. """
 
         serializer = CreateAccountSerializer(data=request.data)
-        if serializer.is_valid():
-            user_object = User(
-                username=serializer.validated_data.get('username'),
-                email=serializer.validated_data.get('email'),
-                first_name=serializer.validated_data.get('first_name'),
-                last_name=serializer.validated_data.get('last_name')
-            )
-            user_object.set_password(request.data.get('password'))
-            user_object.save()
-            token, _ = Token.objects.get_or_create(user=user_object)
-            return Response(data={
-                'id': user_object.id,
-                'username': user_object.username,
-                'email': user_object.email,
-                'token': token.key
-            }, status=status.HTTP_201_CREATED)
-        else:
-            return Response(
-                data={'errors': serializer.errors},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer.is_valid(raise_exception=True)
+        user_object = User(
+            username=serializer.validated_data.get('username'),
+            email=serializer.validated_data.get('email'),
+            first_name=serializer.validated_data.get('first_name'),
+            last_name=serializer.validated_data.get('last_name')
+        )
+        user_object.set_password(request.data.get('password'))
+        user_object.save()
+        token, _ = Token.objects.get_or_create(user=user_object)
+        return Response(data={
+            'id': user_object.id,
+            'username': user_object.username,
+            'email': user_object.email,
+            'token': token.key
+        }, status=status.HTTP_201_CREATED)
 
     def put(self, request, *arg, **kwargs):
+        """ PUT method use for edit user account. """
 
         serializer = UpdateAccountSerializer(data=request.data)
-        if serializer.is_valid():
-            user_object = User.objects.get(id=request.user.id)
-            user_object.email = serializer.validated_data.get('email')
-            user_object.first_name = serializer.validated_data.get(
-                'first_name')
-            user_object.last_name = serializer.validated_data.get('last_name')
-            user_object.save()
-            return Response(
-                data={
-                    'message': 'Your account has been updated successfully.'
-                }, status=status.HTTP_200_OK
-            )
-        else:
-            return Response(
-                data={'errors': serializer.errors},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer.is_valid(raise_exception=True)
+        user_object = User.objects.get(id=request.user.id)
+        user_object.email = serializer.validated_data.get('email')
+        user_object.first_name = serializer.validated_data.get(
+            'first_name')
+        user_object.last_name = serializer.validated_data.get('last_name')
+        user_object.save()
+        return Response(
+            data={
+                'message': 'Your account has been updated successfully.'
+            }, status=status.HTTP_200_OK
+        )
 
     def delete(self, request, *arg, **kwargs):
+        """ DELETE method use for delete a user. """
 
         user_object = User.objects.get(id=request.user.id)
         user_object.delete()
