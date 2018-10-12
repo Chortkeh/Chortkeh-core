@@ -48,18 +48,14 @@ class GroupApiView(views.APIView):
         """ POST method use for create a new group. """
 
         serializer = GroupSerializer(data=request.data)
-        if serializer.is_valid():
-            group_object = Group.objects.create(
-                owner=request.user,
-                name=serializer.validated_data.get('name'),
-                action_type=serializer.validated_data.get('action_type')
-            )
-            response_data = {'id': group_object.id}
-            response_status_code = status.HTTP_201_CREATED
-        else:
-            response_data = {'errors': serializer.errors}
-            response_status_code = status.HTTP_400_BAD_REQUEST
-        return Response(data=response_data, status=response_status_code)
+        serializer.is_valid(raise_exception=True)
+        group_object = Group.objects.create(
+            owner=request.user,
+            name=serializer.validated_data.get('name'),
+            action_type=serializer.validated_data.get('action_type')
+        )
+        return Response(
+            data={'id': group_object.id}, status=status.HTTP_201_CREATED)
 
     def put(self, request, *args, **kwargs):
         """ PUT method use for update a group. """
@@ -72,18 +68,15 @@ class GroupApiView(views.APIView):
                 response_status_code = status.HTTP_404_NOT_FOUND
             else:
                 serializer = GroupSerializer(data=request.data)
-                if serializer.is_valid():
-                    group_query.name = serializer.validated_data.get('name')
-                    group_query.action_type = serializer.validated_data.get(
-                        'action_type')
-                    group_query.save()
-                    response_data = {
-                        'message': 'Group has been updated successfully.'
-                    }
-                    response_status_code = status.HTTP_200_OK
-                else:
-                    response_data = {'errors': serializer.errors}
-                    response_status_code = status.HTTP_400_BAD_REQUEST
+                serializer.is_valid(raise_exception=True)
+                group_query.name = serializer.validated_data.get('name')
+                group_query.action_type = serializer.validated_data.get(
+                    'action_type')
+                group_query.save()
+                response_data = {
+                    'message': 'Group has been updated successfully.'
+                }
+                response_status_code = status.HTTP_200_OK
         else:
             response_data = {'errors': 'PK is requirede.'}
             response_status_code = status.HTTP_400_BAD_REQUEST
