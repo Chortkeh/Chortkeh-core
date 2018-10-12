@@ -21,3 +21,10 @@ class UpdateAccountSerializer(serializers.Serializer):
 class WalletSerializer(serializers.Serializer):
 
     name = serializers.CharField(max_length=255)
+
+
+class GroupSerializer(serializers.Serializer):
+
+    action_type_choices = (('inc', 'Income'), ('exp', 'Expense'),)
+    name = serializers.CharField(max_length=255)
+    action_type = serializers.ChoiceField(choices=action_type_choices)
