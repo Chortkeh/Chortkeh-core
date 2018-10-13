@@ -24,9 +24,9 @@ group = [
 
 # Transaction urls #
 transaction = [
-    path('income/', IncomeTransactionApiView, name='income_api_view'),
-    path('income/<int:pk>/',
-         IncomeTransactionApiView, name='income_api_view_pk'),
+    path('income/', IncomeTransactionApiView.as_view(), name='income_api_view'),
+    path('income/<int:pk>/', IncomeTransactionApiView.as_view(),
+         name='income_api_view_pk'),
 ]
 
 # Main urls #
