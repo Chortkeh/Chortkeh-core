@@ -38,3 +38,7 @@ class IncomeTransactionSerializer(serializers.Serializer):
         max_length=255, allow_blank=True, allow_null=True)
     wallet_id = serializers.IntegerField()
     group_id = serializers.IntegerField()
+
+
+class ExpenseTransactionSerializer(IncomeTransactionSerializer):
+    pass
