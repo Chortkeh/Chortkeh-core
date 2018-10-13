@@ -1,8 +1,13 @@
 from rest_framework import views, status, permissions
 from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
 from chortkeh_core.models import Income, Group, Wallet
 from chortkeh_core.api.serializers import IncomeTransactionSerializer
 from chortkeh_core import utils
+
+
+class PaginationClass(LimitOffsetPagination):
+    default_limit = 20
 
 
 class IncomeTransactionApiView(views.APIView):
@@ -10,7 +15,36 @@ class IncomeTransactionApiView(views.APIView):
 
     permission_classes = (permissions.IsAuthenticated,)
 
-    # TODO: Write GET method...
+    def get(self, request, *args, **kwargs):
+        """ GET Method use for get list of transactions. """
+
+        if not kwargs.get('pk'):
+            obj = Income.objects.filter(
+                wallet__owner=request.user).order_by('-time')
+        else:
+            obj = Income.objects.filter(
+                wallet__owner=request.user,
+                wallet__id=kwargs.get('pk')).order_by('-time')
+        paginator = PaginationClass()
+        paginator_res = paginator.paginate_queryset(obj, request)
+        response_list = [{
+            'id': q.id,
+            'amount': q.amount,
+            'time': utils.to_jalali(q.time),
+            'comment': q.comment,
+            'wallet_id': q.wallet_id,
+            'group_id': q.group_id,
+            'type': q.group.action_type
+        } for q in paginator_res]
+        response_data = {
+            'count': paginator.count,
+            'next': paginator.get_next_link(),
+            'previous': paginator.get_previous_link(),
+            'results': response_list
+        }
+        response_status_code = status.HTTP_200_OK
+
+        return Response(data=response_data, status=response_status_code)
 
     def post(self, request, *args, **kwargs):
         """ POST method use for create new transaction. """
