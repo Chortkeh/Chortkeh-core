@@ -1,6 +1,7 @@
 from django.urls import path, include
 from .views.account import GetToken, Account
 from .views.wallet import WalletApiView
+from .views.group import GroupApiView
 
 # Account urls #
 account = [
@@ -14,8 +15,15 @@ wallet = [
     path('<int:pk>/', WalletApiView.as_view(), name='wallet_api_view_pk'),
 ]
 
+# Group urls #
+group = [
+    path('', GroupApiView.as_view(), name='group_api_view'),
+    path('<int:pk>/', GroupApiView.as_view(), name='group_api_view_pk'),
+]
+
 # Main urls #
 urlpatterns = [
     path('account/', include(account)),
-    path('wallet/', include(wallet))
+    path('wallet/', include(wallet)),
+    path('group/', include(group)),
 ]
