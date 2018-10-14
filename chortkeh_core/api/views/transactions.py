@@ -1,9 +1,10 @@
 from rest_framework import views, status, permissions
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
-from chortkeh_core.models import Income, Expense, Group, Wallet
+from chortkeh_core.models import Income, Expense, Group, Wallet, Transfer
 from chortkeh_core.api.serializers import (
-    IncomeTransactionSerializer, ExpenseTransactionSerializer
+    IncomeTransactionSerializer, ExpenseTransactionSerializer,
+    TransferTransactionSerializer
 )
 from chortkeh_core import utils
 
@@ -310,5 +311,42 @@ class ExpenseTransactionApiView(views.APIView):
         else:
             response_data = {'errors': 'PK is requirede.'}
             response_status_code = status.HTTP_400_BAD_REQUEST
+
+        return Response(data=response_data, status=response_status_code)
+
+
+class TransferTransactionApiView(views.APIView):
+    """ This api view use for transfer transactions management. """
+
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        """ POST method use for create new transaction. """
+        rq = request.data.copy()
+        rq.time = utils.to_gregorian(request.data.get('time'))
+        serializer = TransferTransactionSerializer(data=rq)
+        serializer.is_valid(raise_exception=True)
+        try:
+            src_wlt = Wallet.objects.get(
+                id=serializer.validated_data.get('source_wallet'),
+                owner=request.user)
+            trg_wlt = Wallet.objects.get(
+                id=serializer.validated_data.get('target_wallet'),
+                owner=request.user)
+        except src_wlt.ObjectDoesNotExist:
+            response_data = {'errors': 'Source wallet is not Found.'}
+            response_status_code = status.HTTP_404_NOT_FOUND
+        except trg_wlt.ObjectDoesNotExist:
+            response_data = {'errors': 'Target wallet is not Found.'}
+            response_status_code = status.HTTP_404_NOT_FOUND
+        else:
+            obj = Transfer.objects.create(
+                amount=serializer.validated_data.get('amount'),
+                time=serializer.validated_data.get('time'),
+                comment=serializer.validated_data.get('comment'),
+                source_wallet=src_wlt, target_wallet=trg_wlt
+            )
+            response_data = {'id': obj.id}
+            response_status_code = status.HTTP_201_CREATED
 
         return Response(data=response_data, status=response_status_code)
