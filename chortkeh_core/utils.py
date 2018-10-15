@@ -1,4 +1,7 @@
 import jdatetime
+import pytz
+
+Tehran = pytz.timezone(zone='Asia/Tehran')
 
 
 def to_gregorian(strtime=None):
@@ -35,7 +38,7 @@ def jdate_to_str(j_datetime=None):
     """ Get a JdateTime and return a string "1397-07-21 12:32". """
 
     if j_datetime:
-        response = j_datetime.strftime("%Y-%m-%d %H:%M")
+        response = j_datetime.astimezone(tz=Tehran).strftime("%Y-%m-%d %H:%M")
     else:
         response = j_datetime
     return response
