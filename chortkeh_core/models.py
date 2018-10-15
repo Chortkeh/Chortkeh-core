@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django_jalali.db import models as jmodels
 
 User = get_user_model()
 
@@ -29,7 +30,7 @@ class Income(models.Model):
     """ This model for income transactions. """
 
     amount = models.BigIntegerField()
-    time = models.DateTimeField()
+    time = jmodels.jDateTimeField(auto_now_add=True)
     comment = models.CharField(max_length=255, blank=True, null=True)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
@@ -39,7 +40,7 @@ class Expense(models.Model):
     """ This model for expense transactions. """
 
     amount = models.BigIntegerField()
-    time = models.DateTimeField()
+    time = jmodels.jDateTimeField(auto_now_add=True)
     comment = models.CharField(max_length=255, blank=True, null=True)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
@@ -49,7 +50,7 @@ class Transfer(models.Model):
     """ This model for transfer transactions. """
 
     amount = models.BigIntegerField()
-    time = models.DateTimeField()
+    time = jmodels.jDateTimeField(auto_now_add=True)
     comment = models.CharField(max_length=255, blank=True, null=True)
     source_wallet = models.ForeignKey(
         Wallet, on_delete=models.CASCADE, related_name='source_wallet')
