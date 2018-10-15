@@ -17,6 +17,7 @@ class IncomeTransactionApiView(views.APIView):
     """ This api view use for income transactions management. """
 
     permission_classes = (permissions.IsAuthenticated,)
+    allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
 
     def get(self, request, *args, **kwargs):
         """ GET Method use for get list of transactions. """
@@ -168,6 +169,7 @@ class ExpenseTransactionApiView(views.APIView):
     """ This api view use for expense transactions management. """
 
     permission_classes = (permissions.IsAuthenticated,)
+    allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
 
     def get(self, request, *args, **kwargs):
         """ GET Method use for get list of transactions. """

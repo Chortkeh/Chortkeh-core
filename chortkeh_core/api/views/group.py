@@ -1,4 +1,4 @@
-from rest_framework import status, views
+from rest_framework import status, views, permissions
 from rest_framework.response import Response
 from django.core.exceptions import ObjectDoesNotExist
 from chortkeh_core.models import Group
@@ -7,6 +7,9 @@ from chortkeh_core.api.serializers import GroupSerializer
 
 class GroupApiView(views.APIView):
     """ Api view for group management. """
+
+    permission_classes = (permissions.IsAuthenticated,)
+    allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
 
     def get(self, request, *args, **kwargs):
         """ GET method use for get details of groups. """

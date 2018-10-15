@@ -1,17 +1,15 @@
 from rest_framework import views, status, permissions
 from rest_framework.response import Response
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from chortkeh_core.models import Wallet
 from chortkeh_core.api.serializers import WalletSerializer
-
-User = get_user_model()
 
 
 class WalletApiView(views.APIView):
     """ This API view use for wallet managment. """
 
     permission_classes = (permissions.IsAuthenticated,)
+    allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
 
     def get(self, request, *args, **kwargs):
         """ GET method use for get wallets list and details. """

@@ -14,6 +14,7 @@ class GetToken(ObtainAuthToken):
     """ This api view use for login and get token. """
 
     permission_classes = (permissions.AllowAny,)
+    allowed_methods = ('POST',)
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(
@@ -34,6 +35,7 @@ class Account(views.APIView):
     """
 
     permission_classes = (AllowOnlyPost,)
+    allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
 
     def get(self, request, *arg, **kwargs):
         """ GET method use for get user information. """
