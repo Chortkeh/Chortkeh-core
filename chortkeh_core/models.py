@@ -51,7 +51,7 @@ class Transfer(models.Model):
     amount = models.BigIntegerField()
     time = models.DateTimeField()
     comment = models.CharField(max_length=255, blank=True, null=True)
-    source_Wallet = models.ForeignKey(
+    source_wallet = models.ForeignKey(
         Wallet, on_delete=models.CASCADE, related_name='source_wallet')
     target_wallet = models.ForeignKey(
         Wallet, on_delete=models.CASCADE, related_name='target_wallet')
