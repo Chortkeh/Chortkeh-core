@@ -3,7 +3,8 @@ from .views.account import GetToken, Account
 from .views.wallet import WalletApiView
 from .views.group import GroupApiView
 from .views.transactions import (
-    IncomeTransactionApiView, ExpenseTransactionApiView
+    IncomeTransactionApiView, ExpenseTransactionApiView,
+    TransferTransactionApiView
 )
 
 # Account urls #
@@ -32,6 +33,10 @@ transaction = [
     path('expense/', ExpenseTransactionApiView.as_view(), name='expense_api_view'),
     path('expense/<int:pk>/', ExpenseTransactionApiView.as_view(),
          name='expense_api_view_pk'),
+    path('transfer/', TransferTransactionApiView.as_view(),
+         name='transfer_api_view'),
+    path('transfer/<int:pk>/', TransferTransactionApiView.as_view(),
+         name='transfer_api_view_pk'),
 ]
 
 # Main urls #

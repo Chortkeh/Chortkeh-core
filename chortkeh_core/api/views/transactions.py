@@ -319,6 +319,50 @@ class TransferTransactionApiView(views.APIView):
     """ This api view use for transfer transactions management. """
 
     permission_classes = (permissions.IsAuthenticated,)
+    allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
+
+    def get(self, request, *args, **kwargs):
+        """ GET method use for get details of transfer transactions. """
+
+        if kwargs.get('pk'):
+            try:
+                obj = Transfer.objects.get(
+                    id=kwargs.get('pk'), source_wallet__owner=request.user)
+            except obj.ObjectDoesNotExist:
+                response_data = {'errors': 'Transaction not found.'}
+                response_status_code = status.HTTP_404_NOT_FOUND
+            else:
+                response_data = {
+                    'id': obj.id,
+                    'amount': obj.amount,
+                    'time': utils.to_jalali(obj.time),
+                    'comment': obj.comment,
+                    'source_wallet': obj.source_wallet,
+                    'target_wallet': obj.target_wallet
+                }
+                response_status_code = status.HTTP_200_OK
+        else:
+            queryset = Transfer.objects.filter(
+                source_wallet__owner=request.user).order_by('-time')
+            paginator = PaginationClass()
+            paginator_results = paginator.paginate_queryset(queryset, request)
+            results_list = [{
+                'id': q.id,
+                'amount': q.amount,
+                'time': utils.to_jalali(q.time),
+                'comment': q.comment,
+                'source_wallet': q.source_wallet,
+                'target_wallet': q.target_wallet
+            } for q in paginator_results]
+            response_data = {
+                'count': paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'results': results_list
+            }
+            response_status_code = status.HTTP_200_OK
+
+        return Response(data=response_data, status=response_status_code)
 
     def post(self, request, *args, **kwargs):
         """ POST method use for create new transaction. """
@@ -389,6 +433,26 @@ class TransferTransactionApiView(views.APIView):
                 response_data = {
                     'message': 'Transaction has been updated successfully.'}
                 response_status_code = status.HTTP_200_OK
+        else:
+            response_data = {'errors': 'PK is requirede.'}
+            response_status_code = status.HTTP_400_BAD_REQUEST
+
+        return Response(data=response_data, status=response_status_code)
+
+    def delete(self, request, *args, **kwargs):
+        """ DELETE method use for delete a transfer transaction."""
+
+        if kwargs.get('pk'):
+            try:
+                obj = Transfer.objects.get(
+                    id=kwargs.get('pk'), source_wallet__owner=request.user)
+            except obj.ObjectDoesNotExist:
+                response_data = {'errors': 'Transaction not found.'}
+                response_status_code = status.HTTP_404_NOT_FOUND
+            else:
+                obj.delet()
+                response_data = None
+                response_status_code = status.HTTP_204_NO_CONTENT
         else:
             response_data = {'errors': 'PK is requirede.'}
             response_status_code = status.HTTP_400_BAD_REQUEST
