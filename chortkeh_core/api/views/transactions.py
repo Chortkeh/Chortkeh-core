@@ -350,3 +350,47 @@ class TransferTransactionApiView(views.APIView):
             response_status_code = status.HTTP_201_CREATED
 
         return Response(data=response_data, status=response_status_code)
+
+    def put(self, request, *args, **kwargs):
+        """ PUT method use for edit a transfer transaction. """
+
+        if kwargs.get('pk'):
+            try:
+                obj = Transfer.objects.get(
+                    id=kwargs.get('pk'), source_wallet__owner=request.user)
+                rq = request.data.copy()
+                rq.time = utils.to_gregorian(request.data.get('time'))
+                serializer = TransferTransactionSerializer(data=rq)
+                serializer.is_valid(raise_exception=True)
+                src_wlt = Wallet.objects.get(
+                    id=serializer.validated_data.get('source_wallet'),
+                    owner=request.user)
+                trg_wlt = Wallet.objects.get(
+                    id=serializer.validated_data.get('target_wallet'),
+                    owner=request.user)
+            except obj.ObjectDoesNotExist:
+                response_data = {'errors': 'Transaction not found.'}
+                response_status_code = status.HTTP_404_NOT_FOUND
+            except src_wlt.ObjectDoesNotExist:
+                response_data = {'errors': 'Source wallet not found.'}
+                response_status_code = status.HTTP_404_NOT_FOUND
+            except trg_wlt.ObjectDoesNotExist:
+                response_data = {'errors': 'Target wallet not found.'}
+                response_status_code = status.HTTP_404_NOT_FOUND
+            else:
+                obj.amount = serializer.validated_data.get('amount')
+                obj.time = serializer.validated_data.get('time')
+                obj.comment = serializer.validated_data.get('comment')
+                obj.source_wallet = serializer.validated_data.get(
+                    'source_wallet')
+                obj.target_wallet = serializer.validated_data.get(
+                    'target_wallet')
+                obj.save()
+                response_data = {
+                    'message': 'Transaction has been updated successfully.'}
+                response_status_code = status.HTTP_200_OK
+        else:
+            response_data = {'errors': 'PK is requirede.'}
+            response_status_code = status.HTTP_400_BAD_REQUEST
+
+        return Response(data=response_data, status=response_status_code)
