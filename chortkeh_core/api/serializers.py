@@ -33,7 +33,6 @@ class GroupSerializer(serializers.Serializer):
 class IncomeTransactionSerializer(serializers.Serializer):
 
     amount = serializers.IntegerField(min_value=1)
-    time = serializers.DateTimeField()
     comment = serializers.CharField(
         max_length=255, allow_blank=True, allow_null=True)
     wallet_id = serializers.IntegerField(min_value=1)
@@ -47,7 +46,6 @@ class ExpenseTransactionSerializer(IncomeTransactionSerializer):
 class TransferTransactionSerializer(serializers.Serializer):
 
     amount = serializers.IntegerField(min_value=1)
-    time = serializers.DateTimeField()
     comment = serializers.CharField(
         max_length=255, allow_blank=True, allow_null=True)
     source_wallet = serializers.IntegerField(min_value=1)

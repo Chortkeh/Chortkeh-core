@@ -30,7 +30,7 @@ class IncomeTransactionApiView(views.APIView):
             response_list = [{
                 'id': q.id,
                 'amount': q.amount,
-                'time': utils.to_jalali(q.time),
+                'time': utils.jdate_to_str(q.time),
                 'comment': q.comment,
                 'wallet_id': q.wallet_id,
                 'group_id': q.group_id,
@@ -55,7 +55,7 @@ class IncomeTransactionApiView(views.APIView):
                 response_data = {
                     'id': inc_obj.id,
                     'amount': inc_obj.amount,
-                    'time': utils.to_jalali(inc_obj.time),
+                    'time': utils.jdate_to_str(inc_obj.time),
                     'comment': inc_obj.comment,
                     'wallet_id': inc_obj.wallet_id,
                     'group_id': inc_obj.group_id,
@@ -68,9 +68,7 @@ class IncomeTransactionApiView(views.APIView):
     def post(self, request, *args, **kwargs):
         """ POST method use for create new transaction. """
 
-        rq = request.data.copy()
-        rq.time = utils.to_gregorian(request.data.get('time'))
-        serializer = IncomeTransactionSerializer(data=rq)
+        serializer = IncomeTransactionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
             wl_obj = Wallet.objects.get(
@@ -92,7 +90,6 @@ class IncomeTransactionApiView(views.APIView):
             inc_obj = Income.objects.create(
                 wallet=wl_obj, group=gp_obj,
                 amount=serializer.validated_data.get('amount'),
-                time=serializer.validated_data.get('time'),
                 comment=serializer.validated_data.get('comment')
             )
             response_data = {'id': inc_obj.id}
@@ -107,9 +104,7 @@ class IncomeTransactionApiView(views.APIView):
             try:
                 inc_obj = Income.objects.get(
                     id=kwargs.get('pk'), wallet__owner=request.user)
-                rq = request.data.copy()
-                rq.time = utils.to_gregorian(request.data.get('time'))
-                serializer = IncomeTransactionSerializer(data=rq)
+                serializer = IncomeTransactionSerializer(data=request.data)
                 serializer.is_valid(raise_exception=True)
                 wl_obj = Wallet.objects.get(
                     id=serializer.validated_data.get('wallet_id'),
@@ -131,7 +126,6 @@ class IncomeTransactionApiView(views.APIView):
                 response_status_code = status.HTTP_404_NOT_FOUND
             else:
                 inc_obj.amount = serializer.validated_data.get('amount')
-                inc_obj.time = serializer.validated_data.get('time')
                 inc_obj.comment = serializer.validated_data.get('comment')
                 inc_obj.wallet = wl_obj
                 inc_obj.group = gp_obj
@@ -184,7 +178,7 @@ class ExpenseTransactionApiView(views.APIView):
             response_list = [{
                 'id': q.id,
                 'amount': q.amount,
-                'time': utils.to_jalali(q.time),
+                'time': utils.jdate_to_str(q.time),
                 'comment': q.comment,
                 'wallet_id': q.wallet_id,
                 'group_id': q.group_id,
@@ -209,7 +203,7 @@ class ExpenseTransactionApiView(views.APIView):
                 response_data = {
                     'id': exp_obj.id,
                     'amount': exp_obj.amount,
-                    'time': utils.to_jalali(exp_obj.time),
+                    'time': utils.jdate_to_str(exp_obj.time),
                     'comment': exp_obj.comment,
                     'wallet_id': exp_obj.wallet_id,
                     'group_id': exp_obj.group_id,
@@ -222,9 +216,7 @@ class ExpenseTransactionApiView(views.APIView):
     def post(self, request, *args, **kwargs):
         """ POST method use for create new transaction. """
 
-        rq = request.data.copy()
-        rq.time = utils.to_gregorian(request.data.get('time'))
-        serializer = ExpenseTransactionSerializer(data=rq)
+        serializer = ExpenseTransactionSerializer(data=request.user)
         serializer.is_valid(raise_exception=True)
         try:
             wl_obj = Wallet.objects.get(
@@ -246,7 +238,6 @@ class ExpenseTransactionApiView(views.APIView):
             inc_obj = Expense.objects.create(
                 wallet=wl_obj, group=gp_obj,
                 amount=serializer.validated_data.get('amount'),
-                time=serializer.validated_data.get('time'),
                 comment=serializer.validated_data.get('comment')
             )
             response_data = {'id': inc_obj.id}
@@ -261,9 +252,7 @@ class ExpenseTransactionApiView(views.APIView):
             try:
                 inc_obj = Expense.objects.get(
                     id=kwargs.get('pk'), wallet__owner=request.user)
-                rq = request.data.copy()
-                rq.time = utils.to_gregorian(request.data.get('time'))
-                serializer = ExpenseTransactionSerializer(data=rq)
+                serializer = ExpenseTransactionSerializer(data=request.data)
                 serializer.is_valid(raise_exception=True)
                 wl_obj = Wallet.objects.get(
                     id=serializer.validated_data.get('wallet_id'),
@@ -285,7 +274,6 @@ class ExpenseTransactionApiView(views.APIView):
                 response_status_code = status.HTTP_404_NOT_FOUND
             else:
                 inc_obj.amount = serializer.validated_data.get('amount')
-                inc_obj.time = serializer.validated_data.get('time')
                 inc_obj.comment = serializer.validated_data.get('comment')
                 inc_obj.wallet = wl_obj
                 inc_obj.group = gp_obj
@@ -341,7 +329,7 @@ class TransferTransactionApiView(views.APIView):
                 response_data = {
                     'id': obj.id,
                     'amount': obj.amount,
-                    'time': utils.to_jalali(obj.time),
+                    'time': utils.jdate_to_str(obj.time),
                     'comment': obj.comment,
                     'source_wallet': obj.source_wallet,
                     'target_wallet': obj.target_wallet
@@ -355,7 +343,7 @@ class TransferTransactionApiView(views.APIView):
             results_list = [{
                 'id': q.id,
                 'amount': q.amount,
-                'time': utils.to_jalali(q.time),
+                'time': utils.jdate_to_str(q.time),
                 'comment': q.comment,
                 'source_wallet': q.source_wallet,
                 'target_wallet': q.target_wallet
@@ -372,9 +360,8 @@ class TransferTransactionApiView(views.APIView):
 
     def post(self, request, *args, **kwargs):
         """ POST method use for create new transaction. """
-        rq = request.data.copy()
-        rq.time = utils.to_gregorian(request.data.get('time'))
-        serializer = TransferTransactionSerializer(data=rq)
+
+        serializer = TransferTransactionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
             src_wlt = Wallet.objects.get(
@@ -392,7 +379,6 @@ class TransferTransactionApiView(views.APIView):
         else:
             obj = Transfer.objects.create(
                 amount=serializer.validated_data.get('amount'),
-                time=serializer.validated_data.get('time'),
                 comment=serializer.validated_data.get('comment'),
                 source_wallet=src_wlt, target_wallet=trg_wlt
             )
@@ -408,9 +394,7 @@ class TransferTransactionApiView(views.APIView):
             try:
                 obj = Transfer.objects.get(
                     id=kwargs.get('pk'), source_wallet__owner=request.user)
-                rq = request.data.copy()
-                rq.time = utils.to_gregorian(request.data.get('time'))
-                serializer = TransferTransactionSerializer(data=rq)
+                serializer = TransferTransactionSerializer(data=request.data)
                 serializer.is_valid(raise_exception=True)
                 src_wlt = Wallet.objects.get(
                     id=serializer.validated_data.get('source_wallet'),
@@ -429,7 +413,6 @@ class TransferTransactionApiView(views.APIView):
                 response_status_code = status.HTTP_404_NOT_FOUND
             else:
                 obj.amount = serializer.validated_data.get('amount')
-                obj.time = serializer.validated_data.get('time')
                 obj.comment = serializer.validated_data.get('comment')
                 obj.source_wallet = serializer.validated_data.get(
                     'source_wallet')
