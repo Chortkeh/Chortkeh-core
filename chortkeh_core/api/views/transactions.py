@@ -79,6 +79,7 @@ class IncomeTransactionApiView(views.APIView):
             )
             gp_obj = Group.objects.get(
                 id=serializer.validated_data.get('group_id'),
+                action_type='inc',
                 owner=request.user
             )
         except wl_obj.ObjectDoesNotExist:
@@ -116,6 +117,7 @@ class IncomeTransactionApiView(views.APIView):
                 )
                 gp_obj = Group.objects.get(
                     id=serializer.validated_data.get('group_id'),
+                    action_type='inc',
                     owner=request.user
                 )
             except inc_obj.ObjectDoesNotExist:
@@ -231,6 +233,7 @@ class ExpenseTransactionApiView(views.APIView):
             )
             gp_obj = Group.objects.get(
                 id=serializer.validated_data.get('group_id'),
+                action_type='exp',
                 owner=request.user
             )
         except wl_obj.ObjectDoesNotExist:
@@ -268,6 +271,7 @@ class ExpenseTransactionApiView(views.APIView):
                 )
                 gp_obj = Group.objects.get(
                     id=serializer.validated_data.get('group_id'),
+                    action_type='exp',
                     owner=request.user
                 )
             except inc_obj.ObjectDoesNotExist:
