@@ -6,7 +6,7 @@ from .views.transactions import (
     IncomeTransactionApiView, ExpenseTransactionApiView,
     TransferTransactionApiView
 )
-from .views.report import ReportIncomeApiView
+from .views.report import ReportIncomeApiView, ReportExpenseApiView
 
 # Account urls #
 account = [
@@ -48,6 +48,12 @@ report = [
          ReportIncomeApiView.as_view(), name='report_income_ym'),
     path('income/<int:year>/<int:month>/<int:day>/',
          ReportIncomeApiView.as_view(), name='report_income_ymd'),
+    path('expense/<int:year>/',
+         ReportExpenseApiView.as_view(), name='report_expense_y'),
+    path('expense/<int:year>/<int:month>/',
+         ReportExpenseApiView.as_view(), name='report_expense_ym'),
+    path('expense/<int:year>/<int:month>/<int:day>/',
+         ReportExpenseApiView.as_view(), name='report_expense_ymd'),
 ]
 
 # Main urls #
