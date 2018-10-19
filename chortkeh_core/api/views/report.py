@@ -27,7 +27,7 @@ class ReportIncomeApiView(views.APIView):
         month = kwargs.get('month')
         day = kwargs.get('day')
 
-        if (year is None) or (
+        if year is None or year == 0 or month == 0 or day == 0 or (
                 month is not None and month > 12) or (
                     day is not None and day > 31):
             return Response(
@@ -105,7 +105,7 @@ class ReportExpenseApiView(views.APIView):
         month = kwargs.get('month')
         day = kwargs.get('day')
 
-        if (year is None) or (
+        if year is None or year == 0 or month == 0 or day == 0 or (
                 month is not None and month > 12) or (
                     day is not None and day > 31):
             return Response(
