@@ -129,24 +129,24 @@ class ReportExpenseApiView(views.APIView):
             time_lte = jdatetime.datetime(year, 12, 29, 23, 59, 59)
 
         if filter_by == 'group' and filter_id is not None:
-            inc_obj = Expense.objects.filter(
+            exp_obj = Expense.objects.filter(
                 wallet__owner=request.user,
                 time__gte=time_gte, time__lte=time_lte,
                 group_id=int(filter_id)
             ).order_by('-time')
         elif filter_by == 'wallet' and filter_id is not None:
-            inc_obj = Expense.objects.filter(
+            exp_obj = Expense.objects.filter(
                 wallet__owner=request.user,
                 time__gte=time_gte, time__lte=time_lte,
                 wallet_id=int(filter_id)
             ).order_by('-time')
         else:
-            inc_obj = Expense.objects.filter(
+            exp_obj = Expense.objects.filter(
                 wallet__owner=request.user,
                 time__gte=time_gte, time__lte=time_lte
             ).order_by('-time')
         paginator = PaginationClass()
-        paginate_results = paginator.paginate_queryset(inc_obj, request)
+        paginate_results = paginator.paginate_queryset(exp_obj, request)
         response_list = [{
             'id': q.id,
             'amount': q.amount,
