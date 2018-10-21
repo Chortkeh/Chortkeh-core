@@ -25,7 +25,7 @@ class GroupTestCase(TestCase):
         self.UserCreate(username='test', password='test123456')
         Group.objects.create(name='GroupOne', owner=user, action_type='inc')
         Group.objects.create(name='GroupTwo', owner=user, action_type='exp')
-        self.client.login(username=user, password=pwd)
+        self.client.login(username=usr, password=pwd)
 
     def test_get_group_no_pk(self):
         response = self.client.get(reverse('group_api_view'))
