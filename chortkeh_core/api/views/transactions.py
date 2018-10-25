@@ -1,6 +1,7 @@
 from rest_framework import views, status, permissions
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
+from django.core.exceptions import ObjectDoesNotExist
 from chortkeh_core.models import Income, Expense, Group, Wallet, Transfer
 from chortkeh_core.api.serializers import (
     IncomeTransactionSerializer, ExpenseTransactionSerializer,
@@ -46,9 +47,8 @@ class IncomeTransactionApiView(views.APIView):
         else:
             try:
                 inc_obj = Income.objects.get(
-                    id=kwargs.get('pk'), wallet__owner=request.user
-                )
-            except inc_obj.ObjectDoesNotExist:
+                    id=kwargs.get('pk'), wallet__owner=request.user)
+            except Income.DoesNotExist:
                 response_data = {'errors': 'Transaction not found.'}
                 response_status_code = status.HTTP_404_NOT_FOUND
             else:
@@ -80,10 +80,10 @@ class IncomeTransactionApiView(views.APIView):
                 action_type='inc',
                 owner=request.user
             )
-        except wl_obj.ObjectDoesNotExist:
+        except Wallet.DoesNotExist:
             response_data = {'errors': 'Wallet is not Found.'}
             response_status_code = status.HTTP_404_NOT_FOUND
-        except gp_obj.ObjectDoesNotExist:
+        except Group.DoesNotExist:
             response_data = {'errors': 'Group is not Found.'}
             response_status_code = status.HTTP_404_NOT_FOUND
         else:
@@ -115,13 +115,13 @@ class IncomeTransactionApiView(views.APIView):
                     action_type='inc',
                     owner=request.user
                 )
-            except inc_obj.ObjectDoesNotExist:
+            except Income.DoesNotExist:
                 response_data = {'errors': 'Transaction not found.'}
                 response_status_code = status.HTTP_404_NOT_FOUND
-            except wl_obj.ObjectDoesNotExist:
+            except Wallet.DoesNotExist:
                 response_data = {'errors': 'Wallet is not Found.'}
                 response_status_code = status.HTTP_404_NOT_FOUND
-            except gp_obj.ObjectDoesNotExist:
+            except Group.DoesNotExist:
                 response_data = {'errors': 'Group is not Found.'}
                 response_status_code = status.HTTP_404_NOT_FOUND
             else:
@@ -147,7 +147,7 @@ class IncomeTransactionApiView(views.APIView):
             try:
                 inc_obj = Income.objects.get(
                     id=kwargs.get('pk'), wallet__owner=request.user)
-            except inc_obj.ObjectDoesNotExist:
+            except Income.DoesNotExist:
                 response_data = {'errors': 'Transaction not found.'}
                 response_status_code = status.HTTP_404_NOT_FOUND
             else:
@@ -196,7 +196,7 @@ class ExpenseTransactionApiView(views.APIView):
                 exp_obj = Expense.objects.get(
                     id=kwargs.get('pk'), wallet__owner=request.user
                 )
-            except exp_obj.ObjectDoesNotExist:
+            except Expense.DoesNotExist:
                 response_data = {'errors': 'Transaction not found.'}
                 response_status_code = status.HTTP_404_NOT_FOUND
             else:
@@ -228,10 +228,10 @@ class ExpenseTransactionApiView(views.APIView):
                 action_type='exp',
                 owner=request.user
             )
-        except wl_obj.ObjectDoesNotExist:
+        except Wallet.DoesNotExist:
             response_data = {'errors': 'Wallet is not Found.'}
             response_status_code = status.HTTP_404_NOT_FOUND
-        except gp_obj.ObjectDoesNotExist:
+        except Group.DoesNotExist:
             response_data = {'errors': 'Group is not Found.'}
             response_status_code = status.HTTP_404_NOT_FOUND
         else:
@@ -263,13 +263,13 @@ class ExpenseTransactionApiView(views.APIView):
                     action_type='exp',
                     owner=request.user
                 )
-            except inc_obj.ObjectDoesNotExist:
+            except Expense.DoesNotExist:
                 response_data = {'errors': 'Transaction not found.'}
                 response_status_code = status.HTTP_404_NOT_FOUND
-            except wl_obj.ObjectDoesNotExist:
+            except Wallet.DoesNotExist:
                 response_data = {'errors': 'Wallet is not Found.'}
                 response_status_code = status.HTTP_404_NOT_FOUND
-            except gp_obj.ObjectDoesNotExist:
+            except Group.DoesNotExist:
                 response_data = {'errors': 'Group is not Found.'}
                 response_status_code = status.HTTP_404_NOT_FOUND
             else:
@@ -295,7 +295,7 @@ class ExpenseTransactionApiView(views.APIView):
             try:
                 inc_obj = Expense.objects.get(
                     id=kwargs.get('pk'), wallet__owner=request.user)
-            except inc_obj.ObjectDoesNotExist:
+            except Expense.DoesNotExist:
                 response_data = {'errors': 'Transaction not found.'}
                 response_status_code = status.HTTP_404_NOT_FOUND
             else:
@@ -322,7 +322,7 @@ class TransferTransactionApiView(views.APIView):
             try:
                 obj = Transfer.objects.get(
                     id=kwargs.get('pk'), source_wallet__owner=request.user)
-            except obj.ObjectDoesNotExist:
+            except Transfer.DoesNotExist:
                 response_data = {'errors': 'Transaction not found.'}
                 response_status_code = status.HTTP_404_NOT_FOUND
             else:
@@ -370,11 +370,8 @@ class TransferTransactionApiView(views.APIView):
             trg_wlt = Wallet.objects.get(
                 id=serializer.validated_data.get('target_wallet'),
                 owner=request.user)
-        except src_wlt.ObjectDoesNotExist:
-            response_data = {'errors': 'Source wallet is not Found.'}
-            response_status_code = status.HTTP_404_NOT_FOUND
-        except trg_wlt.ObjectDoesNotExist:
-            response_data = {'errors': 'Target wallet is not Found.'}
+        except Wallet.DoesNotExist:
+            response_data = {'errors': 'Wallet is not Found.'}
             response_status_code = status.HTTP_404_NOT_FOUND
         else:
             obj = Transfer.objects.create(
@@ -402,14 +399,11 @@ class TransferTransactionApiView(views.APIView):
                 trg_wlt = Wallet.objects.get(
                     id=serializer.validated_data.get('target_wallet'),
                     owner=request.user)
-            except obj.ObjectDoesNotExist:
+            except Transfer.DoesNotExist:
                 response_data = {'errors': 'Transaction not found.'}
                 response_status_code = status.HTTP_404_NOT_FOUND
-            except src_wlt.ObjectDoesNotExist:
-                response_data = {'errors': 'Source wallet not found.'}
-                response_status_code = status.HTTP_404_NOT_FOUND
-            except trg_wlt.ObjectDoesNotExist:
-                response_data = {'errors': 'Target wallet not found.'}
+            except Wallet.DoesNotExist:
+                response_data = {'errors': 'Wallet is not found.'}
                 response_status_code = status.HTTP_404_NOT_FOUND
             else:
                 obj.amount = serializer.validated_data.get('amount')
@@ -435,7 +429,7 @@ class TransferTransactionApiView(views.APIView):
             try:
                 obj = Transfer.objects.get(
                     id=kwargs.get('pk'), source_wallet__owner=request.user)
-            except obj.ObjectDoesNotExist:
+            except Transfer.DoesNotExist:
                 response_data = {'errors': 'Transaction not found.'}
                 response_status_code = status.HTTP_404_NOT_FOUND
             else:
